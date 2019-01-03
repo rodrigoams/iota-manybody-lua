@@ -1,0 +1,39 @@
+# these will probably work if Lua has been installed globally
+LUA= /usr/local
+LUAINC= $(LUA)/include
+LUALIB= $(LUA)/lib
+LUABIN= $(LUA)/bin
+
+# probably no need to change anything below here
+RM= rm
+CC= gcc
+CFLAGS= -std=c99 $(INCS) $(WARN) -march=native -Ofast -fopenmp $G -fPIC
+WARN= -pedantic -Wall -Wextra
+INCS= -I$(LUAINC)
+MAKESO= $(CC) -shared
+#MAKESO= $(CC) -bundle -undefined dynamic_lookup
+
+all: test doc
+
+test: number.so array.so
+	$(LUABIN)/lua test.lua
+
+number.so: number.o
+	$(MAKESO) -o number.so number.o
+
+array.so: array.o number.so
+	$(MAKESO) -fopenmp -o array.so array.o number.so
+
+clean:
+	$(RM) *.so *.o
+
+doc:
+	@echo "iota.complex.number library:"
+	@fgrep '/**' number.c | cut -f2 -d/ | tr -d '*' | sort | column
+	@echo "iota.complex.array library:"
+	@fgrep '/**' array.c | cut -f2 -d/ | tr -d '*' | sort 
+
+number.o: icomplex.h number.c
+array.o: icomplex.h array.c
+
+# eof
