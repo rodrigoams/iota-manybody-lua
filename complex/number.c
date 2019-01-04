@@ -49,7 +49,8 @@ static int Ltostring(lua_State *L)		/** tostring(z) */
 	//	else if (y==-1) lua_pushliteral(L,"-");
 	//	else {
 			//if (y>0 && x!=0) 
-			lua_pushliteral(L,"+");
+			//if (y>=0) lua_pushliteral(L,"+");
+			lua_pushliteral(L," ");
 			lua_pushnumber(L,y);
 		//}
 		lua_pushliteral(L,"i");

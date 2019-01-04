@@ -4,6 +4,7 @@ local tmove,unpack,tsort,tinsert,tremove = table.move, table.unpack, table.sort,
 local complex = assert(require"iota.complex.number")
 local fock_ket = assert(require"iota.fock.ket")
 local fock_tuple = assert(require"iota.fock.tuple")
+local fock_space = assert(require"iota.fock.space")
 
 local driver = {}
 
@@ -134,6 +135,62 @@ driver.createBosons = function (b,n1,n2)
 	end
 	
 	return tuple
+end
+
+local DEBUG = false
+
+driver.Hstate = function(state,Hket,notsilent)
+	local print = print
+	do
+		local cprint = print
+		print = function(...) if notsilent then cprint(...) end end
+	end
+	
+	print"COMPUTING Hstate.." 
+	assert(fock_space.check(state))
+	assert(type(Hket) == 'function', 'Second argument must be a funciton of signature Hket(H,ketj), with H == H(coef,ket)')
+	
+	local clock,ts1,ts2,ts3,time = os.clock,0.0,0.0,0.0,0.0
+	
+	local ket2str = fock_ket.ket2str
+	local checkket = fock_ket.check
+	local str2ket = fock_ket.str2ket
+	local tuple = state.tuple
+	
+	local newstate = fock_space.new(tuple)
+	
+	local H = function(c,ket)
+		local coef = ket:getcoef()
+		if coef ~= complex.new(0.0) then
+			if DEBUG then if not tuple[ket] then io.stderr:write("\nWARNING: ket ", tostring(ket)," not found on tuple space!\n\n") end end
+			local str = ket2str(ket)
+			newstate[ket] = newstate[ket] + c*coef
+		end
+	end
+
+	local count = 0
+	local countmax = #state
+	
+	for ket,coef in state:iter() do
+	
+		count  = count+1
+		if (count%10000 == 0 or count == countmax ) and notsilent then
+			io.write(string.format("\r%d %3.1f %%",count,1.0*count/countmax*100))
+			io.flush()
+		end
+		
+		-- create state of action of H() on ket, namely, the Hamiltonian |ketj>.
+		time = clock()
+		Hket(H,ket:setcoef(coef))
+		ts3 = ts3 + (clock()-time)
+	end
+	
+	local printf = function(...) print(string.format(...)) end
+	printf("\n	TIME TO CALL Hket: %.2f sec", ts3)
+	printf("	MEMORY USAGE:    %.3f MB", collectgarbage("count")/1024)
+	print"END"
+	
+	return newstate
 end
 
 driver.braHket = function(tuple,Hket,iHj)

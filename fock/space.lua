@@ -18,7 +18,7 @@ local space,spacemt = {},{}
 
 space.version = "fock.space from ιlibrary for ".. _VERSION .. "/ Jan 2019"
 
-local DEBUG = true
+local DEBUG = false
 
 printd = function(...) if DEBUG then print(...) end end
 
@@ -63,6 +63,7 @@ space.new = function (tuple)
 	local data = {} -- array of ket2str with coefficients, default 0.0
 	local tuple = tuple
 	local len = 0
+	local biscopy = false
 	return setmetatable({ -- state
 			tuple = tuple,
 			iter = function(t)
@@ -77,9 +78,10 @@ space.new = function (tuple)
 			end
 			return iter,t,nil
 		end
-	},{
+	},{ -- state metatable
 		data = data,
 		setlen = function(s) assert(type(s) == 'number' or checkcomplex(s)) len=s end,
+		iscopy = function() return biscopy end,
 		__name = spacemt,
 		__index = function(t,k)
 			if checkket(k) then return data[ket2str(k)] or 0.0 end
@@ -90,9 +92,11 @@ space.new = function (tuple)
 			assert(checkcoef(v), "'value' is not a (complex) number.")
 			if checkket(k) then
 				local str = ket2str(k)
-				if data[str] then print("WARNING: rewriting data["..tostring(k).."] = "..tostring(v).." from tuple!!")
-				else len = len+1 end
-				data[str] = v
+				if DEBUG and data[str] then io.stderr:write("\nWARNING: rewriting data["..tostring(k).."] = "..tostring(v).." from tuple!!\n\n") end
+				if not data[str] then len = len+1 end
+				if v ~= complex.zero then
+					data[str] = v
+				end
 			else print("Invalid key, you must use a 'fock.ket' ") end
 		end,
 		__len = function(t) return len end

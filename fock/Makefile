@@ -18,9 +18,10 @@ MAKESO= $(CC) -shared
 
 all: ket.so tuple.so
 
-test: ket.so tuple.so
+test: ket.so tuple.so space.lua
 	$(LUABIN)/lua test_ket.lua
 	$(LUABIN)/lua test_hubbard.lua
+	$(LUABIN)/lua test_space.lua
 
 ket.so: ket.o
 	$(MAKESO) -o ket.so ket.o $(DIR)/complex/number.so

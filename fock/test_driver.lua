@@ -3,7 +3,7 @@ local complex = require"iota.complex.number"
 local fock_driver = require"iota.fock.driver"
 
 local basis = {}
-local N = 26
+local N = 16
 for k=1,N do basis[k] = k end
 
 local tuple = fock_driver.createFermions(basis,math.tointeger(N/2))
