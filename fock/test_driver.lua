@@ -3,7 +3,7 @@ local complex = require"iota.complex.number"
 local fock_driver = require"iota.fock.driver"
 
 local basis = {}
-local N = 20
+local N = 26
 for k=1,N do basis[k] = k end
 
 local tuple = fock_driver.createFermions(basis,math.tointeger(N/2))
@@ -19,7 +19,7 @@ for k,v in pairs(tuple) do
 	else
 		assert(v>0 and v<=max)
 		if not check[v] then check[v] = v else error("indice existente") end
-		print(v,k)
+		print(string.format("%15d",v),k)
 		assert(tuple[k] == v)
 	end
 end

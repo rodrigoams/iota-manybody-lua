@@ -21,6 +21,12 @@
 #define cneg(z)		(-(z))
 #define cconj		l_mathop(conj)
 
+/** check(z) */
+static int check(lua_State *L) {
+	lua_pushboolean(L, luaL_testudata(L,1,COMPLEXTYPE) != NULL  );
+	return 1;
+}
+
 static int Leq(lua_State *L)			/** __eq(z,w) */
 {
 	lua_pushboolean(L, Z(1)==Z(2));
@@ -34,18 +40,20 @@ static int Ltostring(lua_State *L)		/** tostring(z) */
 	LUA_NUMBER y=cimag(z);
 	lua_settop(L,0);
 	lua_pushliteral(L,"[");
-	if (x!=0 || y==0) lua_pushnumber(L,x);
-	if (y!=0) {
-		if (y==1) {
-			if (x!=0) lua_pushliteral(L,"+");
-		}
-		else if (y==-1) lua_pushliteral(L,"-");
-		else {
-			if (y>0 && x!=0) lua_pushliteral(L,"+");
+	//if (x!=0 || y==0)
+	lua_pushnumber(L,x);
+	//if (y!=0) {
+	//	if (y==1) {
+	//		if (x!=0) lua_pushliteral(L,"+");
+	//	}
+	//	else if (y==-1) lua_pushliteral(L,"-");
+	//	else {
+			//if (y>0 && x!=0) 
+			lua_pushliteral(L,"+");
 			lua_pushnumber(L,y);
-		}
+		//}
 		lua_pushliteral(L,"i");
-	}
+	//}
 	lua_pushliteral(L,"]");
 	lua_concat(L,lua_gettop(L));
 	return 1;
@@ -87,6 +95,7 @@ F(tanh)			/** tanh(z) */
 
 static const luaL_Reg R[] =
 {
+	{"check", check},
 	{ "__add",	Ladd	},
 	{ "__div",	Ldiv	},
 	{ "__eq",	Leq	},
@@ -135,6 +144,9 @@ int luaopen_iota_complex_number(lua_State *L)
  lua_settable(L,-3);
  lua_pushliteral(L,"one");			/** one: 1.0+0.0i */
  ipushcomplex(L,1.0);
+ lua_settable(L,-3);
+ lua_pushliteral(L,"zero");			/** zero: 0.0+0.0i */
+ ipushcomplex(L,0.0);
  lua_settable(L,-3);
  lua_pushliteral(L,"__pow");			/** __pow(z,w) */
  lua_pushliteral(L,"pow");

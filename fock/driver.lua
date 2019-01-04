@@ -7,7 +7,7 @@ local fock_tuple = assert(require"iota.fock.tuple")
 
 local driver = {}
 
-driver.version = "fock.driver from ιlibrary for Lua 5.4 / Jan 2019"
+driver.version = "fock.driver from ιlibrary for ".. _VERSION .. "/ Jan 2019"
 
 local checkket = function(ket)
 	return ket and type(ket) == 'userdata' and getmetatable(ket).__name == 'fock.ket'

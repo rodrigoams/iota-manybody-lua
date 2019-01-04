@@ -2,11 +2,21 @@
 
 #define MYVERSION "fock.tuple from ιlibrary for " LUA_VERSION " / Jan 2019"
 
+/** check(tuple)			: return boolean		:  true if metatable(fock.tuple) == "fock.tuple" */
+static int tuple_check(lua_State *L) {
+	lua_pushboolean(L, luaL_testudata(L,1,"fock.tuple") != NULL  );
+	return 1;
+}
+
 /** __index(tuple,k)		: return  unsigned integer	:  tuple[k] */
 static int tuple__index(lua_State *L) {
+	// P1
 	luaL_checkudata(L,1,"fock.tuple");
+	// P2
 	int type = lua_type(L,2);
+	// P3
 	if (LUA_TTABLE != lua_getiuservalue(L, 1, 1)) luaL_error(L, "Invalid uservalue 1 of tuple!");
+	
 	if (type == LUA_TUSERDATA) {
 		struct_ket * uket = (struct_ket *)luaL_checkudata(L, 2, "fock.ket");
 		lua_pushlstring(L, (const char*)uket->b, (uket->len)*sizeof(struct ukb));
@@ -134,6 +144,7 @@ static const luaL_Reg ket_m [] = {
 
 static const luaL_Reg fock_tuple[] = {
 	{"new", tuple_new},
+	{"check",tuple_check},
 	{NULL, NULL}
 };
 

@@ -13,7 +13,9 @@ INCS= -I$(LUAINC)
 MAKESO= $(CC) -shared
 #MAKESO= $(CC) -bundle -undefined dynamic_lookup
 
-all: test doc
+.PHONY: all clean doc
+
+all: number.so array.so
 
 test: number.so array.so
 	$(LUABIN)/lua test.lua

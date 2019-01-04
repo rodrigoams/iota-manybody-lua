@@ -9,6 +9,12 @@ static uk ket_checkuk(lua_State *L, int arg) {
 	return (uk)(i);
 }
 
+/** check(ket)			: return boolean		:  true if metatable(fock.ket) == 'fock.ket' */
+static int ket_check(lua_State *L) {
+	lua_pushboolean(L, luaL_testudata(L,1,"fock.ket") != NULL  );
+	return 1;
+}
+
 /** ket:copy()			: return  ket			:  ket->copy = true */
 static int ket_copy(lua_State *L) {
 	//printf("CONSTRUCTING NEW KET\n");
@@ -27,12 +33,25 @@ static int ket_copy(lua_State *L) {
 	return 1;
 }
 
-//static int ket_get(lua_State *L) {
-//	struct_ket * array = luaL_checkudata(L, 1, "fock.ket");
-//	ipushcomplex(L, array->coef);
-//	lua_pushlstring(L, (const char*)array->b, (array->len)*sizeof(struct ukb));
-//	return 2;
-//}
+/** ket2str(ket)			: return long string		:  unique id of |ket> */
+static int ket_ket2str(lua_State *L) {
+	struct_ket * array = luaL_checkudata(L, 1, "fock.ket");
+	lua_pushlstring(L, (const char*)array->b, (array->len)*sizeof(struct ukb));
+	return 1;
+}
+
+/** str2ket(string)		: return ket			:  from ket2str() */
+static int ket_str2ket(lua_State *L) {
+	size_t l;
+	struct_ukb * b  = (struct_ukb *)luaL_checklstring(L,1,&l);
+	l = l/sizeof(struct_ukb);
+	struct_ket * ket = ket_construct(L,l,1.0);
+	for (size_t k=0;k<l;k++) {
+		UKn(ket,k) = b[k].num;
+		UKs(ket,k) = b[k].sym;
+	}
+	return 1;
+}
 
 /** __len(ket)			: return  unsigned integer	:  ket->len */
 static int ket__len(lua_State *L) {
@@ -105,6 +124,7 @@ static int ket__tostring (lua_State *L) {
 	luaL_buffinit(L, &b);
 	
 	ipushcomplex(L,ket->coef);
+	luaL_tolstring(L,-1,NULL);
 	luaL_addvalue(&b);
 	
 	luaL_addstring(&b," | ");
@@ -114,7 +134,7 @@ static int ket__tostring (lua_State *L) {
 		luaL_addvalue(&b);
 		luaL_addstring(&b," ");
 	}
-	if (ket->len == 0) luaL_addstring(&b,"∅");//\u2205 ");
+	if (ket->len == 0) luaL_addstring(&b,"∅ ");//\u2205 ");
 	
 	luaL_addstring(&b,"⟩");//"\u27E9 ");
 	
@@ -355,6 +375,9 @@ static const luaL_Reg ket_m [] = {
 };
 
 static const luaL_Reg fock_ket[] = {
+	{"check",ket_check},
+	{"ket2str",ket_ket2str},
+	{"str2ket",ket_str2ket},
 	{NULL, NULL}
 };
 

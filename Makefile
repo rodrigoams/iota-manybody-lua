@@ -1,3 +1,5 @@
+DIR= $(PWD)
+
 # these will probably work if Lua has been installed globally
 LUA= /usr/local
 LUAINC= $(LUA)/include
@@ -14,30 +16,27 @@ INCS= -I$(LUAINC)
 MAKESO= $(CC) -shared
 #MAKESO= $(CC) -bundle -undefined dynamic_lookup
 
-.PHONY: all clean doc
+SUBDIRS = complex fock
 
-all: ket.so tuple.so
+.PHONY: all doc clean $(SUBDIRS)
 
-test: ket.so tuple.so
-	$(LUABIN)/lua test_ket.lua
-	$(LUABIN)/lua test_hubbard.lua
+all: $(SUBDIRS)
 
-ket.so: ket.o
-	$(MAKESO) -o ket.so ket.o $(DIR)/complex/number.so
+$(SUBDIRS):
+	$(MAKE) -C $@ DIR=$(DIR)
 
-tuple.so: tuple.o
-	$(MAKESO) -o tuple.so tuple.o
+doc: complex fock
+	@$(MAKE) -C complex doc
+	@$(MAKE) -C fock doc
 
-clean:
-	$(RM) *.o *.so
+clean: complex fock
+	@$(MAKE) -C complex clean
+	@$(MAKE) -C fock clean
 
-doc:
-	@echo "iota.fock.tuple library:"
-	@fgrep '/**' tuple.c | cut -f2 -d/ | tr -d '*' | sort
-	@echo "iota.fock.ket library:"
-	@fgrep '/**' ket.c | cut -f2 -d/ | tr -d '*' | sort
+test: complex fock
+	@$(MAKE) -C complex test
+	@$(MAKE) -C fock test
 
-ket.o: ifock.h ket.c
-tuple.o: ifock.h tuple.c
+fock: complex
 
 #eof
