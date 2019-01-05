@@ -16,11 +16,17 @@ INCS= -I$(LUAINC)
 MAKESO= $(CC) -shared
 #MAKESO= $(CC) -bundle -undefined dynamic_lookup
 
+LUASOURCE = lua-5.4.0-work2
+LUACODES = fock/space.lua fock/driver.lua sparse/matrix.lua
 SUBDIRS = complex fock
 
-.PHONY: all doc clean $(SUBDIRS)
+.PHONY: all doc clean lua $(SUBDIRS) $(LUACODES)
 
-all: $(SUBDIRS)
+all: $(LUASOURCE) $(SUBDIRS) $(LUACODES)
+
+$(LUASOURCE): $(LUASOURCE).tar.gz
+	[ -d $(LUASOURCE) ] || tar zxvf $(LUASOURCE).tar.gz
+	$(MAKE) -C $(LUASOURCE) linux CFLAGS=-fPIC
 
 $(SUBDIRS):
 	$(MAKE) -C $@ DIR=$(DIR)
@@ -29,9 +35,10 @@ doc: complex fock
 	@$(MAKE) -C complex doc
 	@$(MAKE) -C fock doc
 
-clean: complex fock
-	@$(MAKE) -C complex clean
-	@$(MAKE) -C fock clean
+clean:
+	$(MAKE) -C complex clean
+	$(MAKE) -C fock clean
+	[ -d $(LUASOURCE) ] && $(RM) -rf $(LUASOURCE)
 
 test: complex fock
 	@$(MAKE) -C complex test

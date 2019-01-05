@@ -74,13 +74,17 @@ end
 local Hmatrix = fock_driver.get_Hmatrix(tuple, Hket)
 
 local eigvals = {}
+for k=1,#tuple do print(k,0.0) eigvals[k] = 0.0 end -- make sequence
 do
-	local Jacobi = require"iota.LinearAlgebra.Jacobi"
-	local evec,eval = Jacobi(Hmatrix)
-	for k,v in pairs(eval.mat[1]) do eigvals[k] = v end
+	local jacobi = require"iota.linearalgebra.jacobi"
+	local evec,eval = jacobi(Hmatrix)
+	print"JACOBI OUTPUT"
+
+	for k,v in pairs(eval) do print(k,v) eigvals[k] = v end
 end
 table.sort(eigvals, function(a,b)return complex.real(a) < complex.real(b)  end)
 
+-- BEGIN EXACT RESULTS
 local eval = {}
 -- nparticles
 eval[0] = {0}
@@ -89,6 +93,7 @@ local D = complex.sqrt(16*T*complex.conj(T) + U*complex.conj(U))
 eval[2] = {0.0,0.0,0.0,U,0.5*(U-D),0.5*(U+D)}
 eval[3] = {T+U,-T+U,T+U,-T+U}
 eval[4] = {2*U}
+-- END EXACT RESULTS
 
 local eval2 = {}
 for n=1,4 do

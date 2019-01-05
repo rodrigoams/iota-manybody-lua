@@ -245,9 +245,9 @@ driver.braHket = function(tuple,Hket,iHj)
 end
 
 driver.get_Hmatrix = function(tuple,Hket)
-	local Matrix = require"iota.Matrix"
+	local matrix = require"iota.sparse.matrix"
 	local mat = nil
-	if Matrix then mat = Matrix.newmat(#tuple,#tuple,true)
+	if matrix then mat = matrix.newmat(#tuple,#tuple)
 	else
 		mat = setmetatable({},{__index = function(t,k) local nt={} rawset(t,k,nt) return nt end})
 	end
@@ -259,6 +259,7 @@ driver.get_Hmatrix = function(tuple,Hket)
 	
 	driver.braHket(tuple,Hket,iHj)
 	
+	print(string.format("get_Hmatrix returned matrix: #tuple^2: %d nnz: %d sparsity: %.2e", (#tuple)^2, mat.nnz, mat.nnz/(#tuple)^2))
 	return mat
 end
 
