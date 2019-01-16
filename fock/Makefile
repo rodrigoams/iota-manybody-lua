@@ -1,9 +1,3 @@
-# these will probably work if Lua has been installed globally
-LUA= /usr/local
-LUAINC= $(LUA)/include
-LUALIB= $(LUA)/lib
-LUABIN= $(LUA)/bin
-
 # probably no need to change anything below here
 RM= rm
 CC= gcc
@@ -24,7 +18,7 @@ test: ket.so tuple.so space.lua
 	$(LUABIN)/lua test_space.lua
 
 ket.so: ket.o
-	$(MAKESO) -o ket.so ket.o $(DIR)/complex/number.so
+	$(MAKESO) -o ket.so ket.o $(DIR)iota/complex/number.so
 
 tuple.so: tuple.o
 	$(MAKESO) -o tuple.so tuple.o

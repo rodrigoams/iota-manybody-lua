@@ -119,7 +119,7 @@ return function (a)
 		end
 	end
 
-	return eigsort(x,d,-1)
+	return eigsort(x,d,1)
 end
 
 --[[

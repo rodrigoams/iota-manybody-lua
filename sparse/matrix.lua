@@ -141,7 +141,7 @@ matrix.tostring = function(mat)
 	for i=1,mat.nrows do
 	for j=1,mat.ncolumns do
 		if j == 1 then H = H .. "{" end
-		H = H .. string.format("%f",mat[i][j])
+		H = H .. tostring(mat[i][j])
 		if j ~= mat.ncolumns then H = H .. "," end
 		if j == mat.ncolumns then
 			if i ~= mat.ncolumns then H = H .. "},\n"

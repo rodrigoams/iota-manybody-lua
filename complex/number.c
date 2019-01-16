@@ -39,7 +39,7 @@ static int Ltostring(lua_State *L)		/** tostring(z) */
 	LUA_NUMBER x=creal(z);
 	LUA_NUMBER y=cimag(z);
 	lua_settop(L,0);
-	lua_pushliteral(L,"[");
+	lua_pushliteral(L,"(");
 	//if (x!=0 || y==0)
 	lua_pushnumber(L,x);
 	//if (y!=0) {
@@ -50,12 +50,12 @@ static int Ltostring(lua_State *L)		/** tostring(z) */
 	//	else {
 			//if (y>0 && x!=0) 
 			//if (y>=0) lua_pushliteral(L,"+");
-			lua_pushliteral(L," ");
+			lua_pushliteral(L,",");
 			lua_pushnumber(L,y);
 		//}
-		lua_pushliteral(L,"i");
+		//lua_pushliteral(L,"i");
 	//}
-	lua_pushliteral(L,"]");
+	lua_pushliteral(L,")");
 	lua_concat(L,lua_gettop(L));
 	return 1;
 }
